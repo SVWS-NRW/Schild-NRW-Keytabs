@@ -1,0 +1,53 @@
+plugins {
+    id 'maven-publish'
+    id 'distribution'
+}
+
+group = 'de.nrw.schule.svws'
+version = '1.0.7'
+
+
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/SVWS-NRW/Schild-NRW-Keytabs"
+            credentials {
+            	username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        mavenZip(MavenPublication) {
+            artifact  'build/files.zip'
+            artifactId = 'svws-schild-nrw-keytabs'
+            pom {
+                name = 'SVWS Schild3 Vorlagen'
+                description = 'Diese Bibliothek stellt das ZIP-Archiv für die Schild-NRW-Keytabs zur Verfügung.'
+                url = 'http://www.svws.nrw.de'
+                licenses {
+                    license {
+                        name = 'OpenData by IT.NRW'
+                        url = 'https://www.it.nrw.de/'
+                    }
+                }
+                scm {
+                    connection = 'scm:git@github.com/SVWS-NRW/Schild-NRW-Keytabs'
+                    developerConnection = 'scm:git@github.com/SVWS-NRW/Schild-NRW-Keytabs.git'
+                    url = 'https://github.com/SVWS-NRW/Schild-NRW-Keytabs.git'
+                }
+            }
+        }
+    }
+}
+
+task doZip(type: Zip) {
+    archiveFileName = "files.zip"
+    destinationDirectory = file("$buildDir")
+    from "$projectDir/files"
+}
+
+assemble.dependsOn doZip
+generatePomFileForMavenZipPublication.dependsOn build
